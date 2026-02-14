@@ -2,6 +2,8 @@ package com.jaroso.proyectosensores.controllers;
 
 import com.jaroso.proyectosensores.dto.SensorCreateDto;
 import com.jaroso.proyectosensores.dto.SensorDto;
+import com.jaroso.proyectosensores.dto.SensorUpdateDto;
+import com.jaroso.proyectosensores.entities.Sensor;
 import com.jaroso.proyectosensores.mappers.SensorMapper;
 import com.jaroso.proyectosensores.repositories.SensorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +40,27 @@ public class SensorController {
         return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toDto(SensorRepository.save(mapper.toEntity(sensor))));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<SensorDto> updateSensor(@PathVariable Long id, @RequestBody SensorUpdateDto sensor){
+        Optional<Sensor> sensores = SensorRepository.findById(id);
+        if (sensores.isPresent()){
+            sensores.get().setEstado(SensorUpdateDto.);
+            return ResponseEntity.ok(mapper.toDto(SensorRepository.save(sensores.get())));
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
+
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteSensor(@PathVariable Long id){
+        if (SensorRepository.existsById(id)) {
+            SensorRepository.deleteById(id);
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
 }
