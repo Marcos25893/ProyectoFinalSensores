@@ -52,8 +52,6 @@ public class SensorController {
         }
     }
 
-
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSensor(@PathVariable Long id){
         if (SensorRepository.existsById(id)) {
