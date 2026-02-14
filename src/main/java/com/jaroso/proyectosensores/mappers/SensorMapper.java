@@ -10,5 +10,5 @@ import org.springframework.web.bind.annotation.Mapping;
 public interface SensorMapper {
 
     SensorDto toDto (Sensor sensor);
-    Sensor toEntity (SensorCreateDto taskDto);
+    Sensor toEntity (SensorCreateDto sensorDto);
 }
