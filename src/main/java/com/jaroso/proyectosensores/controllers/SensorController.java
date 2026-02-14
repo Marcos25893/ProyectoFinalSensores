@@ -27,10 +27,17 @@ public class SensorController {
         return ResponseEntity.ok(SensorRepository.findAll().stream().map(mapper::toDto).toList());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<SensorDto> getSensorById(@PathVariable Long id){
+        Optional<SensorDto> Sensor = SensorRepository.findById(id).map(mapper::toDto);
+        return Sensor.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
     @PostMapping
     public ResponseEntity<SensorDto> createSensor(@RequestBody SensorCreateDto sensor){
         return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toDto(SensorRepository.save(mapper.toEntity(sensor))));
     }
+
 
 
 }
