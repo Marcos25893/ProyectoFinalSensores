@@ -41,11 +41,12 @@ public class SensorController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SensorDto> updateSensor(@PathVariable Long id, @RequestBody SensorUpdateDto sensor){
-        Optional<Sensor> sensores = SensorRepository.findById(id);
-        if (sensores.isPresent()){
-            sensores.get().setEstado(SensorUpdateDto.);
-            return ResponseEntity.ok(mapper.toDto(SensorRepository.save(sensores.get())));
+    public ResponseEntity<SensorDto> updateSensor(@PathVariable Long id, @RequestBody SensorUpdateDto sensorUpdate){
+        Optional<Sensor> sensor = SensorRepository.findById(id);
+        if (sensor.isPresent()){
+            sensor.get().setEstado(sensorUpdate.estado());
+            sensor.get().setSector(sensorUpdate.sector());
+            return ResponseEntity.ok(mapper.toDto(SensorRepository.save(sensor.get())));
         } else {
             return ResponseEntity.notFound().build();
         }
