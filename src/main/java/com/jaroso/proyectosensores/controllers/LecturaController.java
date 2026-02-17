@@ -35,7 +35,12 @@ public class LecturaController {
 
     @PostMapping
     public ResponseEntity<LecturaDto> createLectura(@RequestBody LecturaCreateDto lectura){
-        return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toDto(lecturaRepository.save(mapper.toEntity(lectura))));
+        if (sensorRepository.existsById(lectura.sensorId())){
+            Lectura nuevaLectura = mapper.toEntity(lectura);
+            return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toDto(lecturaRepository.save(nuevaLectura)));
+        }else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
 
