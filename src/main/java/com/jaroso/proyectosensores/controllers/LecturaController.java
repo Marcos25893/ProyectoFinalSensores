@@ -5,6 +5,7 @@ import com.jaroso.proyectosensores.dto.LecturaDto;
 import com.jaroso.proyectosensores.dto.SensorCreateDto;
 import com.jaroso.proyectosensores.dto.SensorDto;
 import com.jaroso.proyectosensores.entities.Lectura;
+import com.jaroso.proyectosensores.entities.Sensor;
 import com.jaroso.proyectosensores.mappers.LecturaMapper;
 import com.jaroso.proyectosensores.repositories.LecturaRepository;
 import com.jaroso.proyectosensores.repositories.SensorRepository;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("lectura")
@@ -35,10 +37,14 @@ public class LecturaController {
 
     @PostMapping
     public ResponseEntity<LecturaDto> createLectura(@RequestBody LecturaCreateDto lectura){
-        if (sensorRepository.existsById(lectura.sensorId())){
+        Optional<Sensor> sensor = sensorRepository.findById(lectura.sensorId());
+
+        if (sensor.isPresent()) {
             Lectura nuevaLectura = mapper.toEntity(lectura);
-            return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toDto(lecturaRepository.save(nuevaLectura)));
-        }else {
+            nuevaLectura.setSensor(sensor.get());
+            Lectura guardada = lecturaRepository.save(nuevaLectura);
+            return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toDto(guardada));
+        } else {
             return ResponseEntity.badRequest().build();
         }
     }
