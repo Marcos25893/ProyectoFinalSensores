@@ -30,12 +30,12 @@ public class LecturaController {
 
     @GetMapping
     public ResponseEntity<List<LecturaDto>> getAllLecturas() {
-        return ResponseEntity.ok(LecturaRepository.findAll().stream().map(mapper::toDto).toList());
+        return ResponseEntity.ok(lecturaRepository.findAll().stream().map(mapper::toDto).toList());
     }
 
     @PostMapping
     public ResponseEntity<LecturaDto> createLectura(@RequestBody LecturaCreateDto lectura){
-        return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toDto(LecturaRepository.save(mapper.toEntity(lectura))));
+        return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toDto(lecturaRepository.save(mapper.toEntity(lectura))));
     }
 
 
