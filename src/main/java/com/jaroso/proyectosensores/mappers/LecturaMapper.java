@@ -9,6 +9,6 @@ import org.mapstruct.Mapper;
 public interface LecturaMapper {
 
     LecturaDto toDto (Lectura lectura);
-     Lectura toEntity (LecturaCreateDto lecturaDto);
+    Lectura toEntity (LecturaCreateDto lecturaDto);
 
 }
