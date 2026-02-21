@@ -50,7 +50,7 @@ public class LecturaController {
         }
     }
 
-    @GetMapping("/by-sensor")
+    @GetMapping("/bySensorId/{id}")
     public ResponseEntity<List<LecturaDto>> findLecturasBySensorId(@RequestParam Long sensorId) {
         List<LecturaDto> lecturas = lecturaRepository.findAll().stream()
                 .filter(lectura -> lectura.getSensor().getId().equals(sensorId))
