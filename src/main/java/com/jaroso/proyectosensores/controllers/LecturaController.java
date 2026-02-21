@@ -59,6 +59,19 @@ public class LecturaController {
         return ResponseEntity.ok(lecturas);
     }
 
+        @GetMapping("/bySensorIdAndFecha")
+    public ResponseEntity<List<LecturaDto>> findLecturasBySensorIdAndFecha(
+            @RequestBody Long sensorId,
+            @RequestBody LocalDateTime fechaDesde,
+            @RequestBody LocalDateTime fechaHasta) {
+        List<LecturaDto> lecturas = lecturaRepository.findAll().stream()
+                .filter(lectura -> lectura.getSensor().getId().equals(sensorId) &&
+                        lectura.getTimestamp().isAfter(fechaDesde) &&
+                        lectura.getTimestamp().isBefore(fechaHasta))
+                .map(mapper::toDto)
+                .toList();
+        return ResponseEntity.ok(lecturas);
+        }
 
 
 
