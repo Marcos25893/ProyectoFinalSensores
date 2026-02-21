@@ -12,5 +12,5 @@ public interface LecturaRepository extends JpaRepository<Lectura, Long> {
 
     List<Lectura> findLecturasBySensorId(Long sensorId);
 
-    List<Lectura> findLecturasBySensorBetweenFecha(Long sensorId, LocalDateTime fechaDesde, LocalDateTime fechaHasta);
+    List<Lectura> findLecturasBySensorIdAndTimestampBetween(Long sensorId, LocalDateTime fechaDesde, LocalDateTime fechaHasta);
 }
