@@ -51,7 +51,7 @@ public class LecturaController {
     }
 
     @GetMapping("/bySensorId/{sensorId}")
-    public ResponseEntity<List<LecturaDto>> findLecturasBySensorId(@RequestParam Long sensorId) {
+    public ResponseEntity<List<LecturaDto>> findLecturasBySensorId(@PathVariable Long sensorId) {
         List<LecturaDto> lecturas = lecturaRepository.findAll().stream()
                 .filter(lectura -> lectura.getSensor().getId().equals(sensorId))
                 .map(mapper::toDto)
