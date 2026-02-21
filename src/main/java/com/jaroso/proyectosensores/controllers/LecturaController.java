@@ -1,5 +1,6 @@
 package com.jaroso.proyectosensores.controllers;
 
+import com.jaroso.proyectosensores.dto.FiltroLecturasDto;
 import com.jaroso.proyectosensores.dto.LecturaCreateDto;
 import com.jaroso.proyectosensores.dto.LecturaDto;
 import com.jaroso.proyectosensores.entities.Lectura;
@@ -52,26 +53,19 @@ public class LecturaController {
 
     @GetMapping("/bySensorId/{sensorId}")
     public ResponseEntity<List<LecturaDto>> findLecturasBySensorId(@PathVariable Long sensorId) {
-        List<LecturaDto> lecturas = lecturaRepository.findAll().stream()
-                .filter(lectura -> lectura.getSensor().getId().equals(sensorId))
+        List<LecturaDto> lecturas = lecturaRepository.findLecturasBySensorId(sensorId).stream()
                 .map(mapper::toDto)
                 .toList();
         return ResponseEntity.ok(lecturas);
     }
 
-        @GetMapping("/bySensorIdAndFecha")
-    public ResponseEntity<List<LecturaDto>> findLecturasBySensorIdAndFecha(
-            @RequestBody Long sensorId,
-            @RequestBody LocalDateTime fechaDesde,
-            @RequestBody LocalDateTime fechaHasta) {
-        List<LecturaDto> lecturas = lecturaRepository.findAll().stream()
-                .filter(lectura -> lectura.getSensor().getId().equals(sensorId) &&
-                        lectura.getTimestamp().isAfter(fechaDesde) &&
-                        lectura.getTimestamp().isBefore(fechaHasta))
+        @PostMapping("/bySensorIdAndFecha")
+    public ResponseEntity<List<LecturaDto>> findLecturasBySensorIdAndFecha(@RequestBody FiltroLecturasDto filtro) {
+        List<LecturaDto> lecturas = lecturaRepository.findLecturasBySensorIdAndTimestampBetween(filtro.sensorId(), filtro.fechaDesde(), filtro.fechaHasta()).stream()
                 .map(mapper::toDto)
                 .toList();
         return ResponseEntity.ok(lecturas);
-        }
+    }
 
 
 
