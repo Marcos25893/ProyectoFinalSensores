@@ -6,6 +6,8 @@ import com.jaroso.proyectosensores.dto.SensorUpdateDto;
 import com.jaroso.proyectosensores.entities.Sensor;
 import com.jaroso.proyectosensores.mappers.SensorMapper;
 import com.jaroso.proyectosensores.repositories.SensorRepository;
+import com.jaroso.proyectosensores.services.MqttService;
+import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,11 +20,15 @@ import java.util.Optional;
 @RequestMapping("/sensor")
 public class SensorController {
 
+    Logger logger = Logger.getLogger(SensorController.class.getName());
+
     @Autowired
     private SensorRepository SensorRepository;
 
     @Autowired
     private SensorMapper mapper;
+    @Autowired
+    private MqttService mqttService;
 
     @GetMapping
     public ResponseEntity<List<SensorDto>> getAllSensor(){
@@ -41,11 +47,17 @@ public class SensorController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SensorDto> updateSensor(@PathVariable Long id, @RequestBody SensorUpdateDto sensorUpdate){
+    public ResponseEntity<SensorDto> updateSensor(@PathVariable Long id, @RequestBody SensorUpdateDto sensorUpdateDto){
+        logger.info("Actualizando sensor: " + sensorUpdateDto);
         Optional<Sensor> sensor = SensorRepository.findById(id);
         if (sensor.isPresent()){
-            sensor.get().setEstado(sensorUpdate.estado());
-            sensor.get().setSector(sensorUpdate.sector());
+            sensor.get().setEstado(sensorUpdateDto.estado());
+
+            // publica un mensaje MQTT al topic del actuador (ej: actuadores/1/comando con payload ON o OFF)
+            String payload = String.format("{\"estado\": \"%s\"}", sensorUpdateDto.estado());
+            mqttService.publish("iot/sensor/" +
+                    sensor.get().getId() + "/", payload);
+
             return ResponseEntity.ok(mapper.toDto(SensorRepository.save(sensor.get())));
         } else {
             return ResponseEntity.notFound().build();
