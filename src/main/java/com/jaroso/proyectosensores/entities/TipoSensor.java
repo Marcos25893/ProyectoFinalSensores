@@ -1,5 +1,5 @@
 package com.jaroso.proyectosensores.entities;
 
 public enum TipoSensor {
-    HUMEDAD, BOMBA, ULTRASONIDO, CAUDALIMETRO, ELECTROVALVULA, PRESION
+    HUMEDAD, CAUDALIMETRO, ELECTROVALVULA, PRESION, PULSADOR, VOLUMEN
 }
