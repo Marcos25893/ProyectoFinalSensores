@@ -3,8 +3,10 @@ package com.jaroso.proyectosensores.controllers;
 import com.jaroso.proyectosensores.dto.SensorCreateDto;
 import com.jaroso.proyectosensores.dto.SensorDto;
 import com.jaroso.proyectosensores.dto.SensorUpdateDto;
+import com.jaroso.proyectosensores.entities.Sector;
 import com.jaroso.proyectosensores.entities.Sensor;
 import com.jaroso.proyectosensores.mappers.SensorMapper;
+import com.jaroso.proyectosensores.repositories.SectorRepository;
 import com.jaroso.proyectosensores.repositories.SensorRepository;
 import com.jaroso.proyectosensores.services.MqttService;
 import java.util.logging.Logger;
@@ -22,6 +24,9 @@ public class SensorController {
 
     @Autowired
     private SensorRepository SensorRepository;
+
+    @Autowired
+    private SectorRepository SectorRepository;
 
     @Autowired
     private SensorMapper mapper;
@@ -47,7 +52,15 @@ public class SensorController {
 
     @PostMapping
     public ResponseEntity<SensorDto> createSensor(@RequestBody SensorCreateDto sensor){
-        return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toDto(SensorRepository.save(mapper.toEntity(sensor))));
+       Optional<Sector> sector = SectorRepository.findById(sensor.sectorId());
+       if (sector.isPresent()) {
+              Sensor sensorEntity = mapper.toEntity(sensor);
+              sensorEntity.setSector(sector.get());
+              return ResponseEntity.status(HttpStatus.CREATED)
+                     .body(mapper.toDto(SensorRepository.save(sensorEntity)));
+         } else {
+              return ResponseEntity.badRequest().build();
+       }
     }
 
     @PutMapping("/{id}")
