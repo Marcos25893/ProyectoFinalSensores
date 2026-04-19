@@ -4,7 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.locationtech.jts.geom.Point;
 
-@Entity(name = "sensores")
+@Entity
+@Table(name = "sensores")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

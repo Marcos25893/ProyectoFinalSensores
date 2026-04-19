@@ -43,7 +43,7 @@ public class LecturaController {
         if (sensor.isPresent()) {
             Lectura nuevaLectura = mapper.toEntity(lectura);
             nuevaLectura.setSensor(sensor.get());
-            nuevaLectura.setTimestamp(LocalDateTime.now());
+            nuevaLectura.setFechaHora(LocalDateTime.now());
             Lectura guardada = lecturaRepository.save(nuevaLectura);
             return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toDto(guardada));
         } else {
@@ -61,7 +61,7 @@ public class LecturaController {
 
         @PostMapping("/bySensorIdAndFecha")
     public ResponseEntity<List<LecturaDto>> findLecturasBySensorIdAndFecha(@RequestBody FiltroLecturasDto filtro) {
-        List<LecturaDto> lecturas = lecturaRepository.findLecturasBySensorIdAndTimestampBetween(filtro.sensorId(), filtro.fechaDesde(), filtro.fechaHasta()).stream()
+        List<LecturaDto> lecturas = lecturaRepository.findLecturasBySensorIdAndFechaHoraBetween(filtro.sensorId(), filtro.fechaDesde(), filtro.fechaHasta()).stream()
                 .map(mapper::toDto)
                 .toList();
         return ResponseEntity.ok(lecturas);

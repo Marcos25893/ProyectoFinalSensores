@@ -5,7 +5,8 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Entity(name = "lecturas")
+@Entity
+@Table(name = "lecturas")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -25,6 +26,6 @@ public class Lectura {
 
     private String unidad;
 
-    private LocalDateTime timestamp;
+    private LocalDateTime fechaHora;
 
 }

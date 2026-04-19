@@ -138,7 +138,7 @@ public class MqttService {
     private void saveLectura(Double valor, long sensorId) {
         Lectura lectura = new Lectura();
         lectura.setValor(valor);
-        lectura.setTimestamp(LocalDateTime.now());
+        lectura.setFechaHora(LocalDateTime.now());
 
         Optional<Sensor> sensor = sensorRepository.findById(sensorId);
         if (sensor.isEmpty()) {
