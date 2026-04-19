@@ -20,8 +20,6 @@ import java.util.Optional;
 @RequestMapping("/sensor")
 public class SensorController {
 
-    Logger logger = Logger.getLogger(SensorController.class.getName());
-
     @Autowired
     private SensorRepository SensorRepository;
 
@@ -41,6 +39,12 @@ public class SensorController {
         return Sensor.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/bySectorId/{SectorId}")
+    public ResponseEntity<List<SensorDto>> findSensorsBySectorId(@PathVariable Long SectorId) {
+        List<SensorDto> sensors = SensorRepository.findSensoresBySectorId(SectorId).stream().map(mapper::toDto).toList();
+        return ResponseEntity.ok(sensors);
+    }
+
     @PostMapping
     public ResponseEntity<SensorDto> createSensor(@RequestBody SensorCreateDto sensor){
         return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toDto(SensorRepository.save(mapper.toEntity(sensor))));
@@ -48,7 +52,6 @@ public class SensorController {
 
     @PutMapping("/{id}")
     public ResponseEntity<SensorDto> updateSensor(@PathVariable Long id, @RequestBody SensorUpdateDto sensorUpdateDto){
-        logger.info("Actualizando sensor: " + sensorUpdateDto);
         Optional<Sensor> sensor = SensorRepository.findById(id);
         if (sensor.isPresent()){
             sensor.get().setEstado(sensorUpdateDto.estado());
