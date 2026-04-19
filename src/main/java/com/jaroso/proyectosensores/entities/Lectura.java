@@ -27,8 +27,4 @@ public class Lectura {
 
     private LocalDateTime timestamp;
 
-
-
-
-
 }

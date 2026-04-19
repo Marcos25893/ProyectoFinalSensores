@@ -1,9 +1,5 @@
 package com.jaroso.proyectosensores.entities;
 
 public enum TipoSensor {
-    HUMEDAD, CAUDALIMETRO, PRESION, PULSADOR, VOLUMEN, ELECTROVALVULA, BOMBA
+    BOMBA, ELECTROVALVULA, PRESION, CAUDAL, HUMEDAD, CONDUCTIVIDAD, EV_NUTRIENTES, VIENTO, DIR_VIENTO, PLUVIOMETRIA, TEMPERATURA, HUMEDAD_EXTERNA, PRESION_EXTERNA, NIVEL
 }
-
-//2 Electovalvula
-//2 Humedad
-//Actuadores: 1 bomba, 2 electroválvula
