@@ -37,7 +37,7 @@ public class MqttService {
 
     Logger logger = Logger.getLogger(MqttService.class.getName());
 
-    public MqttService(@Value("${mqtt.host:184.73.39.231}") String host,
+    public MqttService(@Value("${mqtt.host:localhost}") String host,
                        @Value("${mqtt.port:1883}") int port) {
         this.host = host;
         this.port = port;
