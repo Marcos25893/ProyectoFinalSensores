@@ -63,7 +63,7 @@ public class SensorController {
        }
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/sensores/{id}")
     public ResponseEntity<SensorDto> updateSensor(@PathVariable Long id, @RequestBody SensorUpdateDto sensorUpdateDto){
         Optional<Sensor> sensor = SensorRepository.findById(id);
         if (sensor.isPresent()){
