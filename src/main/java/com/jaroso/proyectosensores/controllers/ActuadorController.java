@@ -7,17 +7,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/automatizar/dispositivos")
 public class ActuadorController {
 
     @Autowired
     private GestionRiegoService gestionRiegoService;
 
-    @PostMapping("/controlar")
+    @PostMapping("/automatizar/actuadores")
     public ResponseEntity<SensorDecisionResponseDto> controlarActuador(@RequestBody ActuatorActionDto peticion) {
         SensorDecisionResponseDto respuesta =
                 gestionRiegoService.procesarCambioEstado(peticion.id(), peticion.estado());
