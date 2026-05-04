@@ -35,16 +35,16 @@ public class GestionRiegoService {
 
         if (sensor.getTipo() == TipoSensor.ELECTROVALVULA) {
 
-            if (nuevoEstado == EstadoSensor.ENCENDIDO) {
-                gestionarBomba(sectorId, EstadoSensor.ENCENDIDO, mapaAcciones);
+            if (nuevoEstado == EstadoSensor.ACTIVO) {
+                gestionarBomba(sectorId, EstadoSensor.ACTIVO, mapaAcciones);
             }
-            else if (nuevoEstado == EstadoSensor.APAGADO) {
+            else if (nuevoEstado == EstadoSensor.INACTIVO) {
                 if (isUltimaValvulaActiva(sectorId, idActuador)) {
-                    gestionarBomba(sectorId, EstadoSensor.APAGADO, mapaAcciones);
+                    gestionarBomba(sectorId, EstadoSensor.INACTIVO, mapaAcciones);
                 }
             }
         }
-        else if (sensor.getTipo() == TipoSensor.BOMBA && nuevoEstado == EstadoSensor.APAGADO) {
+        else if (sensor.getTipo() == TipoSensor.BOMBA && nuevoEstado == EstadoSensor.INACTIVO) {
             forzarCierreValvulas(sectorId, mapaAcciones);
         }
 
@@ -60,12 +60,12 @@ public class GestionRiegoService {
     private boolean isUltimaValvulaActiva(Long sectorId, Long valvulaActualId) {
         return sensorRepository.findBySectorIdAndTipo(sectorId, TipoSensor.ELECTROVALVULA).stream()
                 .filter(v -> !v.getId().equals(valvulaActualId))
-                .noneMatch(v -> v.getEstado() == EstadoSensor.ENCENDIDO);
+                .noneMatch(v -> v.getEstado() == EstadoSensor.ACTIVO);
     }
 
     private void forzarCierreValvulas(Long sectorId, Map<Long, EstadoSensor> acciones) {
         sensorRepository.findBySectorIdAndTipo(sectorId, TipoSensor.ELECTROVALVULA)
-                .forEach(v -> acciones.put(v.getId(), EstadoSensor.APAGADO));
+                .forEach(v -> acciones.put(v.getId(), EstadoSensor.INACTIVO));
     }
 
     private List<ActuatorActionDto> publicar(Map<Long, EstadoSensor> acciones) {
@@ -76,7 +76,7 @@ public class GestionRiegoService {
                 sensorRepository.save(s);
 
                 if (s.getTopicMQTTAct() != null && !s.getTopicMQTTAct().isEmpty()) {
-                    String comando = (estado == EstadoSensor.ENCENDIDO) ? "1" : "0";
+                    String comando = (estado == EstadoSensor.ACTIVO) ? "1" : "0";
                     mqttService.publish(s.getTopicMQTTAct(), comando);
                 }
                 historial.add(new ActuatorActionDto(id, estado));
