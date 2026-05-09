@@ -31,6 +31,9 @@ public class MqttService {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private RiegoAutomaticoService riegoAutomaticoService;
+
     private final Mqtt3AsyncClient client;
     private final String host;
     private final int port;
@@ -112,6 +115,12 @@ public class MqttService {
         String contenido = new String(mensaje.getPayloadAsBytes());
         double valor = Double.parseDouble(contenido);
         saveLectura(valor, sensorId);
+
+        sensorRepository.findById(sensorId).ifPresent(sensor -> {
+            if (sensor.getTipo() == TipoSensor.NIVEL) {
+                riegoAutomaticoService.evaluarNivel(sensorId, valor);
+            }
+        });
     }
 
     private void procesarHumedad(Mqtt3Publish mensaje, long sensorId) {

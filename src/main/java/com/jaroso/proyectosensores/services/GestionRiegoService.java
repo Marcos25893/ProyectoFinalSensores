@@ -33,6 +33,16 @@ public class GestionRiegoService {
 
         Long sectorId = sensor.getSector().getId();
 
+        if (sensor.getTipo() == TipoSensor.BOMBA && nuevoEstado == EstadoSensor.ACTIVO) {
+            boolean hayValvulasAbiertas = sensorRepository.findBySectorIdAndTipo(sectorId, TipoSensor.ELECTROVALVULA)
+                    .stream()
+                    .anyMatch(v -> v.getEstado() == EstadoSensor.ACTIVO);
+
+            if (!hayValvulasAbiertas) {
+                return new SensorDecisionResponseDto(false, "No se puede encender la bomba no hay ninguna valvula abierta", List.of());
+            }
+        }
+
         if (sensor.getTipo() == TipoSensor.ELECTROVALVULA) {
 
             if (nuevoEstado == EstadoSensor.ACTIVO) {
