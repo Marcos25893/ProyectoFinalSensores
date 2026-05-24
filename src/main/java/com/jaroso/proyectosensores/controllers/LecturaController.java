@@ -66,8 +66,4 @@ public class LecturaController {
                 .toList();
         return ResponseEntity.ok(lecturas);
     }
-
-
-
-
 }

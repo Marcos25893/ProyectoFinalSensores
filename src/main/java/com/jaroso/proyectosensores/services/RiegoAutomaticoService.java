@@ -19,7 +19,15 @@ public class RiegoAutomaticoService {
     @Lazy
     private GestionRiegoService gestionRiegoService;
 
+    @Autowired
+    private ModoRiegoService modoRiegoService;
+
     public void evaluarNivel(Long idSensorNivel, Double valorActual) {
+
+        if (!modoRiegoService.isAutomatico()) {
+            return;
+        }
+
         Map<Long, Long> mapeoValvula = Map.of(
                 8L, 2L,
                 9L, 3L,
