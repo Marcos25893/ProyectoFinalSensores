@@ -29,9 +29,9 @@ public class RiegoAutomaticoService {
         }
 
         Map<Long, Long> mapeoValvula = Map.of(
-                8L, 2L,
-                9L, 3L,
-                10L, 4L
+                6L, 2L,
+                7L, 3L,
+                8L, 4L
         );
 
         Long idValvulaLlenado = mapeoValvula.get(idSensorNivel);

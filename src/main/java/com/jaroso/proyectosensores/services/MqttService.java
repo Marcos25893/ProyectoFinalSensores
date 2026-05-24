@@ -94,51 +94,151 @@ public class MqttService {
             procesarHumedad(mensaje, sensorId);
         } else if (tipo == TipoSensor.CAUDAL) {
             procesarCaudal(mensaje, sensorId);
-        } else if (tipo == TipoSensor.NIVEL || tipo == TipoSensor.PRESION || tipo == TipoSensor.TEMPERATURA ||
-                tipo == TipoSensor.CONDUCTIVIDAD || tipo == TipoSensor.PRESION_EXTERNA) {
-            procesarNivelPresion(mensaje, sensorId);
+        } else if (tipo == TipoSensor.NIVEL) {
+            procesarNivel(mensaje, sensorId);
+        } else if (tipo == TipoSensor.PRESION || tipo == TipoSensor.PRESION_EXTERNA) {
+            procesarPresion(mensaje, sensorId);
+        } else if (tipo == TipoSensor.TEMPERATURA || tipo == TipoSensor.CONDUCTIVIDAD) {
+            procesarGenerico(mensaje, sensorId);
         } else if (tipo == TipoSensor.BOMBA || tipo == TipoSensor.ELECTROVALVULA || tipo == TipoSensor.EV_NUTRIENTES) {
             procesarActuador(mensaje, sensorId);
         }
     }
 
     private void procesarCaudal(Mqtt3Publish mensaje, long sensorId) {
-        logger.info("Recibiendo mensaje presion/nivel de: " + mensaje.getTopic());
-        String contenido = new String(mensaje.getPayloadAsBytes(), StandardCharsets.UTF_8).trim();
-        double pulsos = Double.parseDouble(contenido);
-        double caudalLMin = pulsos / 75.0;
-        saveLectura(caudalLMin, sensorId);
+        String payload = new String(mensaje.getPayloadAsBytes(), StandardCharsets.UTF_8).trim();
+        int valor = 0;
+        try {
+            valor = Integer.parseInt(payload);
+        } catch (Exception ex) {
+            logger.warning("Error en la lectura del caudal " + payload);
+            return;
+        }
+
+        logger.info("Recibiendo mensaje caudal de: " + mensaje.getTopic() + " con valor: " + valor);
+
+        int caudalRawInt = valor - 100;
+        double caudalLMin = 0.0;
+
+        if (caudalRawInt <= 0) {
+            caudalLMin = 0;
+        } else {
+            caudalLMin = (caudalRawInt / 75.0);
+        }
+
+        if ((caudalLMin > 10) || (caudalLMin < 0)) {
+            logger.info("No se guarda el valor de caudal fuera de rango: " + caudalLMin);
+        } else {
+            saveLectura(caudalLMin, sensorId);
+        }
     }
 
-    private void procesarNivelPresion(Mqtt3Publish mensaje, long sensorId) {
-        logger.info("Recibiendo mensaje presion/nivel de: " + mensaje.getTopic());
-        String contenido = new String(mensaje.getPayloadAsBytes());
-        double valor = Double.parseDouble(contenido);
-        saveLectura(valor, sensorId);
+    private void procesarNivel(Mqtt3Publish mensaje, long sensorId) {
+        String payload = new String(mensaje.getPayloadAsBytes(), StandardCharsets.UTF_8).trim();
+        logger.info("Recibiendo mensaje de sensor de nivel: " + mensaje.getTopic() + " con valor: " + payload);
 
-        sensorRepository.findById(sensorId).ifPresent(sensor -> {
-            if (sensor.getTipo() == TipoSensor.NIVEL) {
-                riegoAutomaticoService.evaluarNivel(sensorId, valor);
-            }
-        });
+        int valor = 0;
+        try {
+            valor = Integer.parseInt(payload) - 100;
+        } catch (Exception ex) {
+            logger.warning("Error en lectura nivel " + payload);
+            return;
+        }
+
+        var areaDm2 = 1.45 * 1.45;
+        var capacidadLitros = 8.0;
+        var volumenL = areaDm2 * (valor / 10.0);
+
+        var litros = capacidadLitros - volumenL;
+        double porcentaje = (litros / capacidadLitros) * 100.0;
+
+        if (porcentaje < 0.0) porcentaje = 0.0;
+        if (porcentaje > 100.0) porcentaje = 100.0;
+
+        logger.info("Nivel valor: " + valor + " con litros: " + litros + " con porcentaje " + porcentaje);
+
+        if (litros < 0 || litros > 8) {
+            return;
+        } else {
+            saveLectura(porcentaje, sensorId);
+            riegoAutomaticoService.evaluarNivel(sensorId, porcentaje);
+        }
+    }
+
+    private void procesarPresion(Mqtt3Publish mensaje, long sensorId) {
+        String payload = new String(mensaje.getPayloadAsBytes(), StandardCharsets.UTF_8).trim();
+        logger.info("Recibiendo mensaje de sensor de presion: " + mensaje.getTopic() + " con valor: " + payload);
+
+        double valorRaw;
+        try {
+            valorRaw = Double.parseDouble(payload) - 450;
+        } catch (Exception ex) {
+            logger.warning("Error en lectura presión " + payload);
+            return;
+        }
+
+        if (valorRaw <= 0.0) valorRaw = 0.0;
+
+        double convCadMv = 1;
+        double convMvBar = 0.003;
+        double presionKgfCm2 = valorRaw * convCadMv * convMvBar;
+
+        if (presionKgfCm2 > 0.4) {
+            logger.info("No se guarda el valor de presión fuera de rango: " + presionKgfCm2);
+        } else {
+            saveLectura(presionKgfCm2, sensorId);
+        }
     }
 
     private void procesarHumedad(Mqtt3Publish mensaje, long sensorId) {
-        logger.info("Recibiendo mensaje humedad de: " + mensaje.getTopic());
-        String contenido = new String(mensaje.getPayloadAsBytes());
-        contenido = contenido.substring(0, contenido.length() - 1);
-        double valor = Double.parseDouble(contenido);
-        saveLectura(valor, sensorId);
+        String payload = new String(mensaje.getPayloadAsBytes(), StandardCharsets.UTF_8).trim();
+        logger.info("Recibiendo mensaje de sensor de humedad: " + mensaje.getTopic() + " con valor: " + payload);
+
+        int valor = 0;
+        try {
+            valor = Integer.parseInt(payload);
+        } catch (Exception ex) {
+            logger.warning("Error en lectura humedad " + payload);
+            return;
+        }
+
+        var cadMin = 330;
+        var cadMax = 715;
+        var humedadRH = 100 - ((100.0 / (cadMax - cadMin)) * (valor - cadMin));
+
+        if ((humedadRH > 100) || (humedadRH < 0)) {
+            logger.info("No se guarda el valor de humedad fuera de rango: " + humedadRH);
+        } else {
+            saveLectura(humedadRH, sensorId);
+        }
+    }
+
+    private void procesarGenerico(Mqtt3Publish mensaje, long sensorId) {
+        String contenido = new String(mensaje.getPayloadAsBytes(), StandardCharsets.UTF_8).trim();
+        try {
+            double valor = Double.parseDouble(contenido);
+            saveLectura(valor, sensorId);
+        } catch (Exception ex) {
+            logger.warning("Error en lectura de sensor genérico " + contenido);
+        }
     }
 
     private void procesarActuador(Mqtt3Publish mensaje, long sensorId) {
-        logger.info("Recibiendo mensaje actuador de: " + mensaje.getTopic());
-        String estadoRaw = new String(mensaje.getPayloadAsBytes(), StandardCharsets.UTF_8).trim().toLowerCase();
+        logger.info("Recibiendo mensaje de sensor de actuador: " + mensaje.getTopic());
+        String payload = new String(mensaje.getPayloadAsBytes(), StandardCharsets.UTF_8).trim();
 
-        double valorEstado = switch (estadoRaw) {
+        String normalizado = "";
+        try {
+            normalizado = String.valueOf(payload.toLowerCase().charAt(0));
+        } catch (Exception ex) {
+            logger.warning("Error en lectura actuador " + payload);
+            return;
+        }
+
+        double valorEstado = switch (normalizado) {
             case "on", "true", "1" -> 1.0;
             case "off", "false", "0" -> 0.0;
-            default -> 0.0;
+            default -> throw new IllegalArgumentException("Payload de actuador no soportado: " + normalizado);
         };
 
         saveLectura(valorEstado, sensorId);
