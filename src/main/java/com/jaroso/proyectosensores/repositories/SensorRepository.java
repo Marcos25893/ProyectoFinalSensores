@@ -13,4 +13,5 @@ public interface SensorRepository extends JpaRepository<Sensor, Long> {
     List<Sensor> findSensoresBySectorId(Long sectorId);
     List<Sensor> findBySectorIdAndTipo(Long sectorId, TipoSensor tipo);
     Optional<Sensor> findFirstBySectorIdAndTipo(Long sectorId, TipoSensor tipo);
+    Optional<Sensor> findByNombre(String nombre);
 }

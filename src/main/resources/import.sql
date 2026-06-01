@@ -29,6 +29,7 @@ CREATE TABLE `lecturas` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `sensor_id` bigint(20) NOT NULL,
   `unidad` varchar(255) DEFAULT NULL,
+  `origen` varchar(10) NOT NULL DEFAULT 'MQTT',
   PRIMARY KEY (`id`),
   KEY `FKawx5iy29jocdow29b0skr8c41` (`sensor_id`),
   CONSTRAINT `FKawx5iy29jocdow29b0skr8c41` FOREIGN KEY (`sensor_id`) REFERENCES `sensores` (`id`)
@@ -42,7 +43,7 @@ CREATE TABLE `lecturas` (
 LOCK TABLES `lecturas` WRITE;
 /*!40000 ALTER TABLE `lecturas` DISABLE KEYS */;
 set autocommit=0;
-INSERT INTO `lecturas` VALUES
+INSERT INTO `lecturas` (`valor`, `fecha_hora`, `id`, `sensor_id`, `unidad`) VALUES
 (80,'2026-04-10 19:00:21.492247',1,5,'cm'),
 (30,'2026-04-10 19:02:39.211932',2,6,'cm'),
 (30,'2026-04-10 19:03:12.335880',3,7,'cm'),

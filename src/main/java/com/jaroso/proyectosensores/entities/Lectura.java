@@ -28,4 +28,8 @@ public class Lectura {
 
     private LocalDateTime fechaHora;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 10)
+    private OrigenLectura origen = OrigenLectura.MQTT;
+
 }
