@@ -86,7 +86,7 @@ public class GestionRiegoService {
                 sensorRepository.save(s);
 
                 if (s.getTopicMQTTAct() != null && !s.getTopicMQTTAct().isEmpty()) {
-                    String comando = (estado == EstadoSensor.ACTIVO) ? "1" : "0";
+                    String comando = (estado == EstadoSensor.ACTIVO) ? "0" : "1";
                     mqttService.publish(s.getTopicMQTTAct(), comando);
                 }
                 historial.add(new ActuatorActionDto(id, estado));

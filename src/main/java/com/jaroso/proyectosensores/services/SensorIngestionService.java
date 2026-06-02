@@ -31,6 +31,9 @@ public class SensorIngestionService {
     @Autowired
     private RiegoAutomaticoService riegoAutomaticoService;
 
+    @Autowired
+    private RiegoAutomaticoHumedadService riegoAutomaticoHumedadService;
+
     /**
      * Punto de entrada principal para procesar y almacenar cualquier lectura.
      */
@@ -69,6 +72,7 @@ public class SensorIngestionService {
             logger.info("No se guarda el valor de humedad fuera de rango: " + humedadRH);
         } else {
             saveLectura(humedadRH, sensorId, origen);
+            riegoAutomaticoHumedadService.evaluarHumedad(sensorId, humedadRH);
         }
     }
 

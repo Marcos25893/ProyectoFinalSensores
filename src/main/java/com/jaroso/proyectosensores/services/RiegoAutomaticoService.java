@@ -1,8 +1,6 @@
 package com.jaroso.proyectosensores.services;
 
 import com.jaroso.proyectosensores.entities.EstadoSensor;
-import com.jaroso.proyectosensores.entities.Sensor;
-import com.jaroso.proyectosensores.entities.TipoSensor;
 import com.jaroso.proyectosensores.repositories.SensorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -20,7 +18,7 @@ public class RiegoAutomaticoService {
     private GestionRiegoService gestionRiegoService;
 
     @Autowired
-    private ModoRiegoService modoRiegoService;
+    private ModoNivelService modoRiegoService;
 
     public void evaluarNivel(Long idSensorNivel, Double valorActual) {
 

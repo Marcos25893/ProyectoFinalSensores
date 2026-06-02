@@ -3,7 +3,7 @@ package com.jaroso.proyectosensores.services;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ModoRiegoService {
+public class ModoHumedadService {
 
     private boolean modoAutomatico = true;
 
