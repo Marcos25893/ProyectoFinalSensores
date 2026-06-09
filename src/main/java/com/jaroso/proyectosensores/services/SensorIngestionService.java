@@ -71,7 +71,7 @@ public class SensorIngestionService {
         if ((humedadRH > 100) || (humedadRH < 0)) {
             logger.info("No se guarda el valor de humedad fuera de rango: " + humedadRH);
         } else {
-            saveLectura(humedadRH, sensorId, origen);
+            saveLectura(humedadRH, "%", sensorId, origen);
             riegoAutomaticoHumedadService.evaluarHumedad(sensorId, humedadRH);
         }
     }
@@ -98,7 +98,7 @@ public class SensorIngestionService {
         if (litros < 0 || litros > 8) {
             return;
         } else {
-            saveLectura(porcentaje, sensorId, origen);
+            saveLectura(porcentaje, "%", sensorId, origen);
             riegoAutomaticoService.evaluarNivel(sensorId, porcentaje);
         }
     }
@@ -121,7 +121,7 @@ public class SensorIngestionService {
         if (presionKgfCm2 > 0.4) {
             logger.info("No se guarda el valor de presión fuera de rango: " + presionKgfCm2);
         } else {
-            saveLectura(presionKgfCm2, sensorId, origen);
+            saveLectura(presionKgfCm2, "bar", sensorId, origen);
         }
     }
 
@@ -146,7 +146,7 @@ public class SensorIngestionService {
         if ((caudalLMin > 10) || (caudalLMin < 0)) {
             logger.info("No se guarda el valor de caudal fuera de rango: " + caudalLMin);
         } else {
-            saveLectura(caudalLMin, sensorId, origen);
+            saveLectura(caudalLMin, "L/min", sensorId, origen);
         }
     }
 
@@ -167,11 +167,11 @@ public class SensorIngestionService {
         };
 
         if (valorEstado >= 0) {
-            saveLectura(valorEstado, sensorId, origen);
+            saveLectura(valorEstado, "", sensorId, origen);
         }
     }
 
-    private void saveLectura(Double valor, long sensorId, OrigenLectura origen) {
+    private void saveLectura(Double valor, String unidad, long sensorId, OrigenLectura origen) {
         Optional<Sensor> sensor = sensorRepository.findById(sensorId);
         if (sensor.isEmpty()) {
             logger.info("Sensor incorrecto, no se puede grabar lectura: " + sensorId);
@@ -180,6 +180,7 @@ public class SensorIngestionService {
 
         Lectura lectura = new Lectura();
         lectura.setValor(valor);
+        lectura.setUnidad(unidad);
         lectura.setFechaHora(LocalDateTime.now());
         lectura.setSensor(sensor.get());
         lectura.setOrigen(origen);
